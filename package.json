@@ -9,7 +9,11 @@
   },
   "dependencies": {
     "next": "9.5.5",
+    "next-svgr": "0.0.2",
     "react": "17.0.0",
-    "react-dom": "17.0.0"
+    "react-dom": "17.0.0",
+    "styled-components": "^5.2.0",
+    "typeface-poppins": "^1.1.13",
+    "typeface-space-mono": "^1.1.13"
   }
 }
