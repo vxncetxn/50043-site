@@ -180,7 +180,7 @@ const ItemStars = styled.div`
 
 const StarIcon = styled(StarSVG)`
   width: 20px;
-  margin-left: 5px;
+  margin: 0 5px 0 2px;
   fill: #f6e05e;
 `;
 
@@ -273,7 +273,13 @@ export default function Home() {
               <GridItem>
                 <ItemImg src={book.imUrl} />
                 <ItemStars>
-                  {5} <StarIcon /> (234 Reviews)
+                  {book.num > 0 ? (
+                    <>
+                      {book.stars} <StarIcon /> ({book.num} Reviews)
+                    </>
+                  ) : (
+                    "No Reviews Yet"
+                  )}
                 </ItemStars>
               </GridItem>
             ))
