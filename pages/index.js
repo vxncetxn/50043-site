@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useQuery, usePaginatedQuery } from "react-query";
 import { useRouter } from "next/router";
+import { host } from "./host.js";
 
 import Image from "../public/hero-image.svg";
 import SearchSVG from "../public/search.svg";
@@ -11,6 +12,8 @@ import PlusSVG from "../public/plus.svg";
 import ChevronLeftSVG from "../public/chevron-left.svg";
 
 import Stack from "../components/Stack";
+
+console.log(host);
 
 const Container = styled.main`
   padding-left: calc(var(--rhythm) * 2);
@@ -192,7 +195,7 @@ function useURLQuery() {
 function fetchItems(page) {
   return new Promise(async (resolve) => {
     const fetched = await fetch(
-      `http://127.0.0.1:3001/api/items?page=${page}`
+      `http://${host}:3001/api/items?page=${page}`
     ).then((res) => res.json());
 
     resolve(fetched.data);
@@ -201,7 +204,7 @@ function fetchItems(page) {
 
 function fetchCount() {
   return new Promise(async (resolve) => {
-    const fetched = await fetch(`http://127.0.0.1:3001/api/count`).then((res) =>
+    const fetched = await fetch(`http://${host}:3001/api/count`).then((res) =>
       res.json()
     );
 
