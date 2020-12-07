@@ -192,7 +192,7 @@ function useURLQuery() {
 function fetchItems(page) {
   return new Promise(async (resolve) => {
     const fetched = await fetch(
-      `http://127.0.0.1:3001/api/items?page=${page}`
+      `http://127.0.0.1/api/items?page=${page}`
     ).then((res) => res.json());
 
     resolve(fetched.data);
@@ -201,7 +201,7 @@ function fetchItems(page) {
 
 function fetchCount() {
   return new Promise(async (resolve) => {
-    const fetched = await fetch(`http://127.0.0.1:3001/api/count`).then((res) =>
+    const fetched = await fetch(`http://127.0.0.1/api/count`).then((res) =>
       res.json()
     );
 
