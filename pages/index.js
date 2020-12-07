@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useQuery, usePaginatedQuery } from "react-query";
 import { useRouter } from "next/router";
-import { host } from "./host.js";
+import { host } from "../host.js";
 
 import Image from "../public/hero-image.svg";
 import SearchSVG from "../public/search.svg";
