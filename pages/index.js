@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useQuery, usePaginatedQuery } from "react-query";
+import { useQuery, usePaginatedQuery, queryCache } from "react-query";
 import { useRouter } from "next/router";
 import { host } from "../host.js";
 
@@ -13,11 +13,38 @@ import ChevronLeftSVG from "../public/chevron-left.svg";
 
 import Stack from "../components/Stack";
 
-console.log(host);
-
 const Container = styled.main`
   padding-left: calc(var(--rhythm) * 2);
   padding-right: calc(var(--rhythm) * 2);
+`;
+
+const Portal = styled.div`
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+`;
+
+const Modal = styled.div`
+  position: relative;
+  width: 60%;
+  height: 80%;
+  display: flex;
+  background-color: var(--color-element);
+  border-radius: 12px;
+`;
+
+const ModalImg = styled.img`
+  width: 50%;
+`;
+
+const ModalContent = styled(Stack)`
+  width: 50%;
 `;
 
 const Hero = styled.section`
@@ -60,7 +87,7 @@ const Content = styled.section`
   display: flex;
   flex-direction: column;
   position: relative;
-  z-index: 1;
+  /* z-index: 1; */
   /* height: 200vh; */
   background-color: var(--color-element);
   border-radius: 12px;
@@ -215,6 +242,7 @@ function fetchCount() {
 export default function Home() {
   const pageQuery = parseInt(useURLQuery().get("page"), 10);
   const [page, setPage] = useState(pageQuery ? pageQuery : 1);
+  const [portal, setPortal] = useState(false);
 
   const {
     isLoading: countLoading,
@@ -228,67 +256,87 @@ export default function Home() {
   } = usePaginatedQuery(["items", page], () => fetchItems(page));
 
   useEffect(() => {
+    const prefetchItems = async () => {
+      await queryCache.prefetchQuery(["items", page + 1], () =>
+        fetchItems(page + 1)
+      );
+    };
+
+    prefetchItems();
     history.pushState({}, "", `/?page=${page}`);
   }, [page]);
 
+  useEffect(() => {
+    9;
+  }, [portal]);
+
   return (
-    <Container>
-      <Hero>
-        <HeroContent space={0.5}>
-          <Header>
-            books<span>.db</span>
-          </Header>
-          <Subtext>
-            This is a database of reviews for books on Amazon's Kindle Store,
-            built as part of our final project for SUTD's 50.043 Database and
-            Big Data Systems.
-          </Subtext>
-        </HeroContent>
-        <HeroImage />
-      </Hero>
-      <Content>
-        <Toolbar>
-          <SearchIcon />
-          <Search placeholder="Search by title or author" />
-          <Pagi>
-            <button onClick={() => setPage(Math.max(1, page - 1))}>
-              <ChevronLeftIcon />
+    <>
+      <Container>
+        <Hero>
+          <HeroContent space={0.5}>
+            <Header>
+              books<span>.db</span>
+            </Header>
+            <Subtext>
+              This is a database of reviews for books on Amazon's Kindle Store,
+              built as part of our final project for SUTD's 50.043 Database and
+              Big Data Systems.
+            </Subtext>
+          </HeroContent>
+          <HeroImage />
+        </Hero>
+        <Content>
+          <Toolbar>
+            <SearchIcon />
+            <Search placeholder="Search by title or author" />
+            <Pagi>
+              <button onClick={() => setPage(Math.max(1, page - 1))}>
+                <ChevronLeftIcon />
+              </button>
+              <span>{page}</span>
+              <button onClick={() => setPage(page + 1)}>
+                <ChevronRightIcon />
+              </button>
+            </Pagi>
+            <button>
+              <FilterIcon />
             </button>
-            <span>{page}</span>
-            <button onClick={() => setPage(page + 1)}>
-              <ChevronRightIcon />
+            <button>
+              <PlusIcon />
             </button>
-          </Pagi>
-          <button>
-            <FilterIcon />
-          </button>
-          <button>
-            <PlusIcon />
-          </button>
-        </Toolbar>
-        <Table>
-          {itemsLoading ? (
-            <div>Loading...</div>
-          ) : itemsError ? (
-            <div>Error: {error.message}</div>
-          ) : (
-            items.map((book, idx) => (
-              <GridItem>
-                <ItemImg src={book.imUrl} />
-                <ItemStars>
-                  {book.num > 0 ? (
-                    <>
-                      {book.stars} <StarIcon /> ({book.num} Reviews)
-                    </>
-                  ) : (
-                    "No Reviews Yet"
-                  )}
-                </ItemStars>
-              </GridItem>
-            ))
-          )}
-        </Table>
-      </Content>
-    </Container>
+          </Toolbar>
+          <Table>
+            {itemsLoading ? (
+              <div>Loading...</div>
+            ) : itemsError ? (
+              <div>Error: {error.message}</div>
+            ) : (
+              items.map((book, idx) => (
+                <GridItem>
+                  <ItemImg src={book.imUrl} />
+                  <ItemStars>
+                    {book.num > 0 ? (
+                      <>
+                        {book.stars} <StarIcon /> ({book.num} Reviews)
+                      </>
+                    ) : (
+                      "No Reviews Yet"
+                    )}
+                  </ItemStars>
+                </GridItem>
+              ))
+            )}
+          </Table>
+        </Content>
+      </Container>
+      {portal ? (
+        <Portal>
+          <Modal>
+            <ModalImg />
+          </Modal>
+        </Portal>
+      ) : null}
+    </>
   );
 }
